@@ -2,10 +2,31 @@
 
 > Group of sysadmin tools
 
+List all the flags and command available.
+
+```
+tools --help
+```
+
+List the flags available for \<command\>.
+
+```
+tools <command> --help
+```
+
 ## apull
 
-> Pulls the latest version of some git repository
+> Command that pulls the latest version for some git repositories
 
-```bash
-tools apull
-```
+## backup
+
+> Command to backup system content
+
+## init
+
+> Command to help initialize a new project
+
+## iterm2
+
+> Command to set some iterm2 preferences
+

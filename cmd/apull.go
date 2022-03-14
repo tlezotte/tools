@@ -6,6 +6,7 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 
@@ -19,19 +20,19 @@ var apullCmd = &cobra.Command{
 	Short: "Pull the lastest version for a repository",
 	Long:  `Pull the lastest version for a repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		local, _ := cmd.Flags().GetBool("local")
-		icloud, _ := cmd.Flags().GetBool("icloud")
-		remote, _ := cmd.Flags().GetBool("remote")
-		if local {
-			apull_local()
-		} else if icloud {
-			apull_icloud()
-		} else if remote {
-			apull_remote()
+		localFlag, _ := cmd.Flags().GetBool("local")
+		icloudFlag, _ := cmd.Flags().GetBool("icloud")
+		remoteFlag, _ := cmd.Flags().GetBool("remote")
+		if localFlag {
+			apullLocal()
+		} else if icloudFlag {
+			apullIcloud()
+		} else if remoteFlag {
+			apullRemote()
 		} else {
-			apull_local()
-			apull_icloud()
-			apull_remote()
+			apullLocal()
+			apullIcloud()
+			apullRemote()
 		}
 	},
 }
@@ -46,25 +47,45 @@ func init() {
 }
 
 var (
-	remoteServer   = "ori1020lp"
+	remoteServer   = "ori1020lp.hs.it.vumc.io"
 	remoteProjects = []string{
 		"ansible",
 		"ansible_dev/lezottt",
 		"ansible_dev/ori_versions",
 	}
-	icloudProjects = []string{"ansible", "docker-centos7-ansible", "docker-centos8-ansible", "images"}
-	icloud         = "$HOME/Library/Mobile Documents/com~apple~CloudDocs/_Code/VICTR"
+	homeDir, _ = os.UserHomeDir()
 )
 
-func apull_local() {
-	os.Chdir("$HOME/code/ansible/ansible")
+// get a list of directories in a directory
+func getProjects(parent string) []string {
+	var projects []string
+	directories, err := ioutil.ReadDir(parent)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, fileInfo := range directories {
+		if fileInfo.IsDir() {
+			projects = append(projects, fileInfo.Name())
+		}
+	}
+	return projects
+}
+
+// Pull the lastest version for local repositories
+func apullLocal() {
+	pathName := "code/ansible/ansible"
+	fullPath := path.Join(homeDir, pathName)
+
+	os.Chdir(fullPath)
 	fmt.Printf("Updating local - ansible ... ")
 	script.Exec("git checkout master")
 	script.Exec("git pull")
 	fmt.Printf("✅\n")
 }
 
-func apull_remote() {
+// Pull the lastest version for remote repositories
+func apullRemote() {
 	for _, project := range remoteProjects {
 		fmt.Printf("Updating %s - %s ... ", remoteServer, project)
 		//cmd := exec.Command("ssh", remoteServer, "cd /app001/" + project + ";git checkout master;git pull")
@@ -78,10 +99,14 @@ func apull_remote() {
 	}
 }
 
-func apull_icloud() {
-	for _, project := range icloudProjects {
+// Pull the lastest version for icloud repositories
+func apullIcloud() {
+	pathName := "Library/Mobile Documents/com~apple~CloudDocs/_Code/VICTR"
+	fullPath := path.Join(homeDir, pathName)
+
+	for _, project := range getProjects(fullPath) {
 		fmt.Printf("Updating iCloud - %s ... ", project)
-		os.Chdir(path.Join(icloud, project))
+		os.Chdir(path.Join(fullPath, project))
 		script.Exec("git pull")
 		fmt.Printf("✅\n")
 	}
