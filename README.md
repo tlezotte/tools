@@ -14,7 +14,7 @@ List the flags available for \<command\>.
 tools <command> --help
 ```
 
-## apull
+## pull
 
 > Command that pulls the latest version for some git repositories
 

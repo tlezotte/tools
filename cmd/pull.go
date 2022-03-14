@@ -14,9 +14,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// apullCmd represents the apull command
-var apullCmd = &cobra.Command{
-	Use:   "apull",
+// pullCmd represents the pull command
+var pullCmd = &cobra.Command{
+	Use:   "pull",
 	Short: "Pull the lastest version for a repository",
 	Long:  `Pull the lastest version for a repository.`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -24,26 +24,26 @@ var apullCmd = &cobra.Command{
 		icloudFlag, _ := cmd.Flags().GetBool("icloud")
 		remoteFlag, _ := cmd.Flags().GetBool("remote")
 		if localFlag {
-			apullLocal()
+			pullLocal()
 		} else if icloudFlag {
-			apullIcloud()
+			pullIcloud()
 		} else if remoteFlag {
-			apullRemote()
+			pullRemote()
 		} else {
-			apullLocal()
-			apullIcloud()
-			apullRemote()
+			pullLocal()
+			pullIcloud()
+			pullRemote()
 		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(apullCmd)
+	rootCmd.AddCommand(pullCmd)
 
 	// Here you will define your flags and configuration settings.
-	apullCmd.Flags().BoolP("local", "l", false, "Pull repository updates on local ansible")
-	apullCmd.Flags().BoolP("icloud", "i", false, "Pull repository updates on all icloud projects")
-	apullCmd.Flags().BoolP("remote", "r", false, "Pull repository updates on some remote projects")
+	pullCmd.Flags().BoolP("local", "l", false, "Pull repository updates on local ansible")
+	pullCmd.Flags().BoolP("icloud", "i", false, "Pull repository updates on all icloud projects")
+	pullCmd.Flags().BoolP("remote", "r", false, "Pull repository updates on some remote projects")
 }
 
 var (
@@ -73,7 +73,7 @@ func getProjects(parent string) []string {
 }
 
 // Pull the lastest version for local repositories
-func apullLocal() {
+func pullLocal() {
 	pathName := "code/ansible/ansible"
 	fullPath := path.Join(homeDir, pathName)
 
@@ -85,7 +85,7 @@ func apullLocal() {
 }
 
 // Pull the lastest version for remote repositories
-func apullRemote() {
+func pullRemote() {
 	for _, project := range remoteProjects {
 		fmt.Printf("Updating %s - %s ... ", remoteServer, project)
 		//cmd := exec.Command("ssh", remoteServer, "cd /app001/" + project + ";git checkout master;git pull")
@@ -100,7 +100,7 @@ func apullRemote() {
 }
 
 // Pull the lastest version for icloud repositories
-func apullIcloud() {
+func pullIcloud() {
 	pathName := "Library/Mobile Documents/com~apple~CloudDocs/_Code/VICTR"
 	fullPath := path.Join(homeDir, pathName)
 
